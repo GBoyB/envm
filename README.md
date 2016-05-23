@@ -4,7 +4,7 @@ Taobao Node Version Manager
 
 ## Installation
 ```shell
-wget -O- https://raw.githubusercontent.com/aliyun-node/tnvm/master/install.sh | bash
+wget -O- https://.githubusercontent.com/aliyun-node/tnvm/master/install.sh | bash
 ```
 PS: 内网环境或者代理环境可在执行上述命令前增加执行, 使用wget获取文件
 ```
