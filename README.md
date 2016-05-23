@@ -1,10 +1,10 @@
-# tnvm
-Taobao Node Version Manager
+# envm
+Easy Node Version Manager
 
 
 ## Installation
 ```shell
-wget -O- https://.githubusercontent.com/aliyun-node/tnvm/master/install.sh | bash
+wget -O- http://github.hzspeed.cn/envm/install.sh | bash
 ```
 PS: 内网环境或者代理环境可在执行上述命令前增加执行, 使用wget获取文件
 ```
@@ -17,31 +17,31 @@ export METHOD=script
 
 
 ## Usage
-Support `alinode`, `node`, `iojs`, `node-profiler` version manager
+Support `easynode`,``alinode`, `node`, `iojs`, `node-profiler` version manager
 
-`tnvm lookup` 查看 `alinode` 基于 `node` 的版本, 便于替换相应版本。
+`envm lookup` 查看 `easynode` 基于 `node` 的版本, 便于替换相应版本。
 
 Example install alinode:
- * tnvm ls-remote alinode
- * tnvm lookup
- * tnvm install alinode-v1.0.1
- * tnvm use alinode-v1.0.1
+ * envm ls-remote easynode
+ * envm lookup
+ * envm install easynode-v7.0.0-pre
+ * envm use easynode-v7.0.0-pre
 
 Example install node:
- * tnvm install node-v4.2.1
- * tnvm use node-v4.2.1
+ * envm install node-v4.2.1
+ * envm use node-v4.2.1
 
 Example install node-profiler:
- * tnvm install profiler-v0.12.6
- * tnvm use profiler-v0.12.6
+ * envm install profiler-v0.12.6
+ * envm use profiler-v0.12.6
 
 More:
- * refer to `tnvm help`
+ * refer to `envm help`
 
 Note:
-  * to remove, delete, or uninstall tnvm - just remove ~/.tnvm folders
+  * to remove, delete, or uninstall envm - just remove ~/.envm folders
 
 
 ## License
 
-tnvm is released under the MIT license.
+envm is released under the MIT license.

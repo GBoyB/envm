@@ -4,12 +4,12 @@ set -e
 
 { # this ensures the entire script is downloaded #
 
-tnvm_has() {
+envm_has() {
   type "$1" > /dev/null 2>&1
 }
 
-if [ -z "$TNVM_DIR" ]; then
-  TNVM_DIR="$HOME/.tnvm"
+if [ -z "$ENVM_DIR" ]; then
+  ENVM_DIR="$HOME/.envm"
 fi
 
 #
@@ -17,16 +17,16 @@ fi
 # * The availability of $NVM_SOURCE
 # * The method used ("script" or "git" in the script, defaults to "git")
 #
-tnvm_source() {
+envm_source() {
   local NVM_METHOD
   NVM_METHOD="$1"
   local NVM_SOURCE_URL
   NVM_SOURCE_URL="$NVM_SOURCE"
   if [ -z "$NVM_SOURCE_URL" ]; then
     if [ "_$NVM_METHOD" = "_script" ]; then
-      NVM_SOURCE_URL="https://raw.githubusercontent.com/aliyun-node/tnvm/master/tnvm.sh"
+      NVM_SOURCE_URL="http://github.hzspeed.cn/envm/envm.sh"
     elif [ "_$NVM_METHOD" = "_git" ] || [ -z "$NVM_METHOD" ]; then
-      NVM_SOURCE_URL="https://github.com/aliyun-node/tnvm.git"
+      NVM_SOURCE_URL="https://github.com/easynode/envm.git"
     else
       echo >&2 "Unexpected value \"$NVM_METHOD\" for \$NVM_METHOD"
       return 1
@@ -35,8 +35,8 @@ tnvm_source() {
   echo "$NVM_SOURCE_URL"
 }
 
-tnvm_download() {
-  if tnvm_has "wget"; then
+envm_download() {
+  if envm_has "wget"; then
     # Emulate curl with wget
     ARGS=$(echo "$*" | command sed -e 's/--progress-bar /--progress=bar /' \
                            -e 's/-L //' \
@@ -45,42 +45,42 @@ tnvm_download() {
                            -e 's/-o /-O /' \
                            -e 's/-C - /-c /')
     wget $ARGS
-  elif tnvm_has "curl"; then
+  elif envm_has "curl"; then
     curl -q $*
   fi
 }
 
-install_tnvm_from_git() {
-  if [ -d "$TNVM_DIR/.git" ]; then
-    echo "=> tnvm is already installed in $TNVM_DIR, trying to update using git"
+install_envm_from_git() {
+  if [ -d "$ENVM_DIR/.git" ]; then
+    echo "=> envm is already installed in $ENVM_DIR, trying to update using git"
     printf "\r=> "
-    cd "$TNVM_DIR" && (command git pull 2> /dev/null || {
-      echo >&2 "Failed to update tnvm, run 'git pull' in $TNVM_DIR yourself." && exit 1
+    cd "$ENVM_DIR" && (command git pull 2> /dev/null || {
+      echo >&2 "Failed to update envm, run 'git pull' in $ENVM_DIR yourself." && exit 1
     })
   else
-    # Cloning to $TNVM_DIR
-    echo "=> Downloading tnvm from git to '$TNVM_DIR'"
+    # Cloning to $ENVM_DIR
+    echo "=> Downloading envm from git to '$ENVM_DIR'"
     printf "\r=> "
-    mkdir -p "$TNVM_DIR"
-    command git clone "$(tnvm_source git)" "$TNVM_DIR"
+    mkdir -p "$ENVM_DIR"
+    command git clone "$(envm_source git)" "$ENVM_DIR"
   fi
-  cd "$TNVM_DIR" && command git checkout --quiet master
+  cd "$ENVM_DIR" && command git checkout --quiet master
   return
 }
 
-install_tnvm_as_script() {
+install_envm_as_script() {
   local NVM_SOURCE_LOCAL
-  NVM_SOURCE_LOCAL=$(tnvm_source script)
+  NVM_SOURCE_LOCAL=$(envm_source script)
 
-  # Downloading to $TNVM_DIR
-  mkdir -p "$TNVM_DIR"
+  # Downloading to $ENVM_DIR
+  mkdir -p "$ENVM_DIR"
 
-  if [ -d "$TNVM_DIR/tnvm.sh" ]; then
-    echo "=> tnvm is already installed in $TNVM_DIR, trying to update the script"
+  if [ -d "$ENVM_DIR/Envm.sh" ]; then
+    echo "=> envm is already installed in $ENVM_DIR, trying to update the script"
   else
-    echo "=> Downloading tnvm as script to '$TNVM_DIR'"
+    echo "=> Downloading envm as script to '$ENVM_DIR'"
   fi
-  tnvm_download -s --no-check-certificate "$NVM_SOURCE_LOCAL" -o "$TNVM_DIR/tnvm.sh" || {
+  envm_download -s --no-check-certificate "$NVM_SOURCE_LOCAL" -o "$ENVM_DIR/envm.sh" || {
     echo >&2 "Failed to download '$NVM_SOURCE_LOCAL'"
     return 1
   }
@@ -92,7 +92,7 @@ install_tnvm_as_script() {
 # The echo'ed path is guaranteed to be an existing file
 # Otherwise, an empty string is returned
 #
-tnvm_detect_profile() {
+envm_detect_profile() {
   if [ -f "$PROFILE" ]; then
     echo "$PROFILE"
   elif [ -f "$HOME/.bashrc" ]; then
@@ -110,7 +110,7 @@ tnvm_detect_profile() {
 # Check whether the user has any globally-installed npm modules in their system
 # Node, and warn them if so.
 #
-tnvm_check_global_modules() {
+envm_check_global_modules() {
   command -v npm >/dev/null 2>&1 || return 0
 
   local NPM_VERSION
@@ -146,44 +146,44 @@ tnvm_check_global_modules() {
 	=> If you wish to uninstall them at a later point (or re-install them under your
 	=> `nvm` Nodes), you can remove them from the system Node as follows:
 
-	     $ tnvm use system
+	     $ envm use system
 	     $ npm uninstall -g a_module
 
 	END_MESSAGE
   fi
 }
 
-tnvm_do_install() {
+envm_do_install() {
   if [ -z "$METHOD" ]; then
     # Autodetect install method
-    if tnvm_has "git"; then
-      install_tnvm_from_git
-    elif tnvm_has "tnvm_download"; then
-      install_tnvm_as_script
+    if envm_has "git"; then
+      install_envm_from_git
+    elif envm_has "envm_download"; then
+      install_envm_as_script
     else
-      echo >&2 "You need git, curl, or wget to install tnvm"
+      echo >&2 "You need git, curl, or wget to install envm"
       exit 1
     fi
   elif [ "~$METHOD" = "~git" ]; then
-    if ! tnvm_has "git"; then
-      echo >&2 "You need git to install tnvm"
+    if ! envm_has "git"; then
+      echo >&2 "You need git to install envm"
       exit 1
     fi
-    install_tnvm_from_git
+    install_envm_from_git
   elif [ "~$METHOD" = "~script" ]; then
-    if ! tnvm_has "tnvm_download"; then
-      echo >&2 "You need curl or wget to install tnvm"
+    if ! envm_has "envm_download"; then
+      echo >&2 "You need curl or wget to install envm"
       exit 1
     fi
-    install_tnvm_as_script
+    install_envm_as_script
   fi
 
   echo
 
   local NVM_PROFILE
-  NVM_PROFILE=$(tnvm_detect_profile)
+  NVM_PROFILE=$(envm_detect_profile)
 
-  SOURCE_STR="\nexport TNVM_DIR=\"$TNVM_DIR\"\n[ -s \"\$TNVM_DIR/tnvm.sh\" ] && . \"\$TNVM_DIR/tnvm.sh\"  # This loads nvm"
+  SOURCE_STR="\nexport ENVM_DIR=\"$ENVM_DIR\"\n[ -s \"\$ENVM_DIR/envm.sh\" ] && . \"\$ENVM_DIR/envm.sh\"  # This loads nvm"
 
   if [ -z "$NVM_PROFILE" ] ; then
     echo "=> Profile not found. Tried $NVM_PROFILE (as defined in \$PROFILE), ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
@@ -194,29 +194,29 @@ tnvm_do_install() {
     printf "$SOURCE_STR"
     echo
   else
-    if ! grep -qc '$TNVM_DIR' "$NVM_PROFILE"; then
+    if ! grep -qc '$ENVM_DIR' "$NVM_PROFILE"; then
       echo "=> Appending source string to $NVM_PROFILE"
       printf "$SOURCE_STR\n" >> "$NVM_PROFILE"
     else
       echo "=> Source string already in $NVM_PROFILE"
     fi
   fi
-  #tnvm_check_global_modules
-  echo "=> Try source $NVM_PROFILE to start using tnvm"
+  #envm_check_global_modules
+  echo "=> Try source $NVM_PROFILE to start using envm"
 
-  tnvm_reset
+  envm_reset
 }
 
 #
 # Unsets the various functions defined
 # during the execution of the install script
 #
-tnvm_reset() {
-  unset -f tnvm_reset tnvm_has \
-    tnvm_source tnvm_download install_tnvm_as_script install_tnvm_from_git \
-    tnvm_detect_profile tnvm_check_global_modules tnvm_do_install
+envm_reset() {
+  unset -f envm_reset envm_has \
+    envm_source envm_download install_envm_as_script install_envm_from_git \
+    envm_detect_profile envm_check_global_modules envm_do_install
 }
 
-tnvm_do_install
+envm_do_install
 
 } # this ensures the entire script is downloaded #
